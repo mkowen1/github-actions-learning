@@ -30,14 +30,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          # Fetch full history for git-revision-date-localized plugin
-          fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -46,8 +38,11 @@ jobs:
           version: "0.8.4"
           cache-dependency-glob: "**/pyproject.toml"
 
+      - name: Setup Python
+        run: uv python install 3.12
+
       - name: Install dependencies
-        run: uv sync --group docs
+        run: uv sync --locked --group docs
 
       - name: Validate MkDocs configuration
         run: uv run mkdocs config
@@ -56,7 +51,7 @@ jobs:
         run: uv run mkdocs build --verbose --clean
 
       - name: Upload build artifacts
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v4
         with:
           path: './site'
 
