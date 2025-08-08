@@ -1,0 +1,97 @@
+name: Deploy Documentation
+
+# Trigger the workflow on push to main branch or manual dispatch
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/deploy-docs.yml'
+  workflow_dispatch:
+
+# Set permissions for GitHub token
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Prevent concurrent deployments
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history for git-revision-date-localized plugin
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          version: "0.8.4"
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --group docs
+
+      - name: Validate MkDocs configuration
+        run: uv run mkdocs config
+
+      - name: Build MkDocs site
+        run: uv run mkdocs build --verbose --clean
+
+      - name: Upload build artifacts
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: './site'
+
+  # Deploy job (only for private repos)
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+  # Notification job (optional)
+  notify:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Notify success
+        if: ${{ needs.build.result == 'success' && needs.deploy.result == 'success' }}
+        run: |
+          echo "✅ Documentation deployed successfully!"
+          echo "🌐 Site URL: ${{ needs.deploy.outputs.page_url }}"
+      
+      - name: Notify failure
+        if: ${{ needs.build.result == 'failure' || needs.deploy.result == 'failure' }}
+        run: |
+          echo "❌ Documentation deployment failed!"
+          echo "Please check the workflow logs for details."

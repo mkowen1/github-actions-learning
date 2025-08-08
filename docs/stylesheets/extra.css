@@ -1,0 +1,70 @@
+/* Custom CSS for MkDocs Material Theme */
+
+:root {
+  /* Custom color overrides */
+  --md-primary-fg-color: #1976d2;
+  --md-accent-fg-color: #3f51b5;
+  
+  /* Custom font sizes */
+  --md-typeset-font-size: 16px;
+  --md-typeset-line-height: 1.6;
+}
+
+/* Custom styling for code blocks */
+.highlight {
+  border-radius: 6px;
+}
+
+/* Enhance mermaid diagrams */
+.mermaid {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* Custom admonition styling */
+.md-typeset .admonition {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Enhanced table styling */
+.md-typeset table:not([class]) {
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Custom navigation styling */
+.md-nav__title {
+  font-weight: 600;
+}
+
+/* Responsive image styling */
+.md-typeset img {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Code copy button enhancement */
+.md-code__copy {
+  border-radius: 4px;
+}
+
+/* Search highlighting */
+.md-search-result__teaser mark {
+  background-color: var(--md-accent-fg-color);
+  color: white;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* Custom footer styling */
+.md-footer {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+/* Enhanced content tabs */
+.md-typeset .tabbed-set {
+  border-radius: 6px;
+  overflow: hidden;
+}
